@@ -71,9 +71,35 @@ class Project(BaseModel):
         return self.name
 
 
-class ProjectResources(BaseModel):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    role = models.ManyToManyField(Role)
+class Resources(BaseModel):
+    project = models.ForeignKey(Project)
+    role = models.ForeignKey(Role)
+    qty = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.project.name
+        return self.project.name + " - " + self.role.name
+
+
+class TaskStatus(BaseModel):
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Task(BaseModel):
+    name = models.CharField(max_length=200)
+    start_date = models.DateField()
+    finish_date = models.DateField()
+    status = models.ForeignKey(TaskStatus)
+
+    def __unicode__(self):
+        return self.name
+
+
+class TaskAllocation(BaseModel):
+    task = models.ForeignKey(Task)
+    employee = models.ForeignKey(Employee)
+
+    def __unicode__(self):
+        return self.task.name + " - " + self.employee.user.username
