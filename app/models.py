@@ -19,9 +19,15 @@ class Role(BaseModel):
     salary = models.FloatField(null=True, blank=True)
     avg_weekly_hours = models.FloatField(null=True, blank=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class EmployeeStatus(BaseModel):
     name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Employee(BaseModel):
@@ -35,3 +41,6 @@ class Employee(BaseModel):
     address = models.TextField(null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
     salary = models.FloatField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.user.username
