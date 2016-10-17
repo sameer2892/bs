@@ -16,8 +16,8 @@ class BaseModel(models.Model):
 
 class Role(BaseModel):
     name = models.CharField(max_length=200)
-    salary = models.FloatField(null=True, blank=True)
-    avg_weekly_hours = models.FloatField(null=True, blank=True)
+    salary = models.FloatField()
+    avg_weekly_hours = models.FloatField()
 
     def __unicode__(self):
         return self.name
@@ -32,15 +32,48 @@ class EmployeeStatus(BaseModel):
 
 class Employee(BaseModel):
     user = models.OneToOneField(User)
-    role = models.ForeignKey(Role, null=True, blank=True)
-    employee_status = models.ForeignKey(EmployeeStatus, null=True, blank=True)
+    role = models.ForeignKey(Role)
+    employee_status = models.ForeignKey(EmployeeStatus)
 
-    emp_id = models.CharField(max_length=100, null=True, blank=True)
-    pan = models.CharField(max_length=20, null=True, blank=True)
-    phone = models.CharField(max_length=10, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-    age = models.IntegerField(null=True, blank=True)
-    salary = models.FloatField(null=True, blank=True)
+    pan = models.CharField(max_length=20)
+    phone = models.CharField(max_length=10)
+    address = models.TextField()
+    age = models.IntegerField()
+    salary = models.FloatField()
 
     def __unicode__(self):
         return self.user.username
+
+
+class Client(BaseModel):
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
+
+class ProjectStatus(BaseModel):
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Project(BaseModel):
+    status = models.ForeignKey(ProjectStatus)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=200)
+    start_date = models.DateField()
+    finish_date = models.DateField()
+
+    def __unicode__(self):
+        return self.name
+
+
+class ProjectResources(BaseModel):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    role = models.ManyToManyField(Role)
+
+    def __unicode__(self):
+        return self.project.name
