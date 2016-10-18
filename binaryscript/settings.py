@@ -31,12 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'suit',
+    'django.contrib.admin',
     'app',
 ]
 
@@ -100,6 +102,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'BinaryScript',
+    'MENU': (
+        'sites',
+    {'app': 'app', 'label': 'BinaryScript App', 'icon':'icon-leaf'},
+    {'app': 'auth', 'label': 'Authorization', 'icon':'icon-lock'},
+    {'app': 'tastypie', 'label': 'Tastypie', 'icon':'icon-ban-circle'},
+    {'app': 'default', 'label': 'System Settings', 'icon':'icon-ban-circle'},
+    # {'app': 'registration', 'label': 'Registration Internals', 'icon':'icon-ban-circle'},
+    ),
+    'MENU_OPEN_FIRST_CHILD': False
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

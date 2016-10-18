@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import timedelta
 
 # Create your models here.
 
@@ -66,6 +67,7 @@ class Project(BaseModel):
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     finish_date = models.DateField()
+    cost = models.FloatField(default=0, editable=False)
 
     def __unicode__(self):
         return self.name
@@ -78,6 +80,18 @@ class Resources(BaseModel):
 
     def __unicode__(self):
         return self.project.name + " - " + self.role.name
+
+    def save(self, *args, **kwargs):
+        salary = Role.objects.get(pk=self.role.id).salary * self.qty
+        print "salary: ", salary
+        months = ((self.project.finish_date - self.project.start_date).days + 1) / 31.0
+        print "months: ", months
+        cost = float(months * salary)
+        print cost
+        self.project.cost += cost
+
+        super(Resources, self).save(*args, **kwargs)
+        self.project.save()
 
 
 class TaskStatus(BaseModel):

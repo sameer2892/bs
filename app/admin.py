@@ -25,6 +25,9 @@ class ProjectStatusAdmin(admin.ModelAdmin):
 
 
 class ResourcesAdmin(admin.ModelAdmin):
+    # list_display = ['project','role']
+    # list_editable = ['role']
+
     class Meta:
         model = Resources
 
@@ -32,6 +35,8 @@ class ResourcesAdmin(admin.ModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     class Meta:
         model = Project
+
+    readonly_fields = ('cost',)
 
 
 class ClientAdmin(admin.ModelAdmin):
