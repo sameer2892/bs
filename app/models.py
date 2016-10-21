@@ -75,12 +75,24 @@ class Project(BaseModel):
     def save(self, *args, **kwargs):
         start_date_old = Project.objects.get(pk=self.id).start_date
         finish_date_old = Project.objects.get(pk=self.id).finish_date
-        resource_obj = Resources.objects.filter(project=self.id)
+        resource_obj = Resources.objects.filter(project=self)
+        print 5555
+        print "old start date: ", start_date_old
+        print "old finish date: ", finish_date_old
+        print "new start date: ", self.start_date
+        print "new finish date: ", self.finish_date
+        super(Project, self).save()
         if self.start_date != start_date_old or self.finish_date != finish_date_old:
+            print 666666
             self.cost = 0
+            print resource_obj
             for each in resource_obj:
+                print 77777
                 print each.project.name
-                each.update_cost()
+                cost_temp = each.update_cost()
+                print 888888
+                print "project cost: ", cost_temp
+                self.cost += cost_temp
         super(Project, self).save()
 
 
@@ -102,15 +114,20 @@ class Resources(BaseModel):
         # super(Resources, self).save()
 
     def update_cost(self):
+        print 11111
         resource_obj = Resources.objects.filter(pk=self.id)
-        months = ((self.project.finish_date - self.project.start_date).days + 1) / 31.0
+        months = float((self.project.finish_date - self.project.start_date).days + 1.0)
+        print "days: ", months
+        months = float(months/31)
         if resource_obj:
+            print 222222
             for resource in resource_obj:
+                print 33333
                 salary_old = Role.objects.get(pk=resource.role.id).salary * resource.qty
 
                 cost_old = float(months * salary_old)
                 self.project.cost -= cost_old
-
+        print 4444
         salary = Role.objects.get(pk=self.role.id).salary * self.qty
         print "salary: ", salary
 
@@ -124,6 +141,8 @@ class Resources(BaseModel):
         print self.project.cost
         print self.project.name
         super(Resources, self).save()
+        print "resource cost: ", cost
+        return cost
 
 
 class TaskStatus(BaseModel):
