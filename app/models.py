@@ -65,11 +65,12 @@ class ProjectStatus(BaseModel):
 class Project(BaseModel):
     status = models.ForeignKey(ProjectStatus)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ManyToManyField(Employee, null=True, blank=True)
 
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     finish_date = models.DateField()
-    cost = models.FloatField(default=0, editable=False)
+    estimated_cost = models.FloatField(default=0, editable=False)
 
     def __unicode__(self):
         return self.name
@@ -165,6 +166,8 @@ class TaskStatus(BaseModel):
 
 
 class Task(BaseModel):
+    employee = models.ManyToManyField(Employee)
+
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     finish_date = models.DateField()
@@ -174,12 +177,12 @@ class Task(BaseModel):
         return self.name
 
 
-class TaskAllocation(BaseModel):
-    task = models.ForeignKey(Task)
-    employee = models.ForeignKey(Employee)
-
-    def __unicode__(self):
-        return self.task.name + " - " + self.employee.user.username
+# class TaskAllocation(BaseModel):
+#     task = models.ForeignKey(Task)
+#     employee = models.ForeignKey(Employee)
+#
+#     def __unicode__(self):
+#         return self.task.name + " - " + self.employee.user.username
 
 
 @receiver(pre_save, sender=Project)
@@ -192,7 +195,7 @@ def update_cost_project(sender, instance, **kwargs):
         cost += float(Role.objects.get(pk=each.role.id).salary * months * each.qty)
 
     print cost
-    instance.cost = cost
+    instance.estimated_cost = cost
 
 
 def update_cost(id_temp):

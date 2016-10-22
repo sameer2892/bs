@@ -36,7 +36,7 @@ class ProjectAdmin(admin.ModelAdmin):
     class Meta:
         model = Project
 
-    readonly_fields = ('cost',)
+    readonly_fields = ('estimated_cost',)
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -54,9 +54,9 @@ class TaskAdmin(admin.ModelAdmin):
         model = Task
 
 
-class TaskAllocationAdmin(admin.ModelAdmin):
-    class Meta:
-        model = TaskAllocation
+# class TaskAllocationAdmin(admin.ModelAdmin):
+#     class Meta:
+#         model = TaskAllocation
 
 admin.site.register(Role, RoleAdmin)
 admin.site.register(EmployeeStatus, EmployeeStatusAdmin)
@@ -67,4 +67,4 @@ admin.site.register(Client, ClientAdmin)
 admin.site.register(Resources, ResourcesAdmin)
 admin.site.register(TaskStatus, TaskStatusAdmin)
 admin.site.register(Task, TaskAdmin)
-admin.site.register(TaskAllocation, TaskAllocationAdmin)
+# admin.site.register(TaskAllocation, TaskAllocationAdmin)
