@@ -8,6 +8,8 @@ class RoleAdmin(admin.ModelAdmin):
     class Meta:
         model = Role
 
+    list_display = ['name', 'salary', 'avg_weekly_hours']
+
 
 class EmployeeStatusAdmin(admin.ModelAdmin):
     class Meta:
@@ -18,6 +20,8 @@ class EmployeeAdmin(admin.ModelAdmin):
     class Meta:
         model = Employee
 
+    list_display = ['user', 'role', 'employee_status', 'salary', 'phone', 'pan', 'address', 'age']
+
 
 class ProjectStatusAdmin(admin.ModelAdmin):
     class Meta:
@@ -25,7 +29,7 @@ class ProjectStatusAdmin(admin.ModelAdmin):
 
 
 class ResourcesAdmin(admin.ModelAdmin):
-    # list_display = ['project','role']
+    list_display = ['project', 'role', 'qty']
     # list_editable = ['role']
 
     class Meta:
@@ -36,7 +40,9 @@ class ProjectAdmin(admin.ModelAdmin):
     class Meta:
         model = Project
 
-    readonly_fields = ('estimated_cost',)
+    readonly_fields = ('estimated_cost', 'signoff_date')
+    list_display = ['name', 'client', 'start_date', 'finish_date', 'status', 'estimated_cost', 'signoff']
+    list_editable = ['signoff']
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -53,6 +59,8 @@ class TaskAdmin(admin.ModelAdmin):
     class Meta:
         model = Task
 
+    list_display = ['name', 'start_date', 'finish_date', 'status']
+    list_editable = ['start_date', 'finish_date', 'status']
 
 # class TaskAllocationAdmin(admin.ModelAdmin):
 #     class Meta:

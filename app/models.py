@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Create your models here.
 
@@ -45,7 +45,7 @@ class Employee(BaseModel):
     salary = models.FloatField()
 
     def __unicode__(self):
-        return self.user.username
+        return self.user.username + " - " + self.role.name
 
 
 class Client(BaseModel):
@@ -67,6 +67,11 @@ class Project(BaseModel):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ManyToManyField(Employee, null=True, blank=True)
 
+    # signup_date = models.DateField(blank=True, editable=False)
+    # deadline_date = models.DateField()
+    signoff = models.BooleanField(default=False)
+    signoff_date = models.DateField(null=True, blank=True, editable=False)
+    # signoff_by = models.ForeignKey(User, null=True, blank=True, editable=False)
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     finish_date = models.DateField()
@@ -196,6 +201,18 @@ def update_cost_project(sender, instance, **kwargs):
 
     print cost
     instance.estimated_cost = cost
+    project_obj = Project.objects.get(pk=instance.id)
+    if instance.signoff:
+        if not project_obj.signoff:
+            status = ProjectStatus.objects.get(name="signed-off")
+            instance.status = status
+            instance.signoff_date = datetime.today()
+
+    else:
+        if project_obj.signoff:
+            status = ProjectStatus.objects.get(name="in-process")
+            instance.status = status
+            instance.signoff_date = None
 
 
 def update_cost(id_temp):
