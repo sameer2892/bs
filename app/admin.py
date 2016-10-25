@@ -41,8 +41,8 @@ class ProjectAdmin(admin.ModelAdmin):
         model = Project
 
     readonly_fields = ('estimated_cost', 'signoff_date')
-    list_display = ['name', 'client', 'start_date', 'finish_date', 'status', 'estimated_cost', 'signoff']
-    list_editable = ['signoff']
+    list_display = ['name', 'client', 'start_date', 'finish_date', 'status', 'estimated_cost', 'signoff', 'final_quote', 'amount_received', 'amount_due']
+    list_editable = ['signoff', 'final_quote']
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -66,6 +66,23 @@ class TaskAdmin(admin.ModelAdmin):
 #     class Meta:
 #         model = TaskAllocation
 
+
+class MilestonesAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Milestones
+
+    list_display = ['name', 'project', 'end_date', 'amount_percentage', 'payment_received']
+    list_editable = ['payment_received']
+
+
+class TransactionsAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Transactions
+    list_display = ['project', 'payment_type', 'payment_received_by', 'amount']
+
+admin.site.register(Transactions, TransactionsAdmin)
+admin.site.register(Milestones, MilestonesAdmin)
+admin.site.register(PaymentType)
 admin.site.register(Role, RoleAdmin)
 admin.site.register(EmployeeStatus, EmployeeStatusAdmin)
 admin.site.register(Employee, EmployeeAdmin)

@@ -72,6 +72,10 @@ class Project(BaseModel):
     signoff = models.BooleanField(default=False)
     signoff_date = models.DateField(null=True, blank=True, editable=False)
     # signoff_by = models.ForeignKey(User, null=True, blank=True, editable=False)
+    final_quote = models.FloatField(default=0, blank=True)
+    amount_received = models.FloatField(default=0, blank=True, editable=False)
+    amount_due = models.FloatField(default=0, blank=True, editable=False)
+
     name = models.CharField(max_length=200)
     start_date = models.DateField()
     finish_date = models.DateField()
@@ -102,6 +106,40 @@ class Project(BaseModel):
     #             print "project cost: ", cost_temp
     #             self.cost += cost_temp
     #     super(Project, self).save()
+
+
+class Milestones(BaseModel):
+    project = models.ForeignKey(Project)
+    name = models.CharField(max_length=100)
+    end_date = models.DateField()
+    description = models.TextField()
+    amount_percentage = models.FloatField(default=0, blank=True)
+    payment_received = models.BooleanField(default=False, help_text="Check if payment has been received")
+
+    def save(self, *args, **kwargs):
+        if 0 <= self.amount_percentage <= 100:
+            sum = 0
+            milestones_obj = Milestones.objects.filter(project=self.project)
+            for each in milestones_obj:
+                sum += each.amount_percentage
+            if sum > 100 or sum < 0:
+                super(Milestones, self).save()
+            else:
+                return
+        else:
+            return
+
+
+class PaymentType(BaseModel):
+    name = models.CharField(max_length=50)
+
+
+class Transactions(BaseModel):
+    project = models.ForeignKey(Project)
+    payment_type = models.ForeignKey(PaymentType, null=True, blank=True)
+    payment_received_by = models.ForeignKey(Employee, null=True, blank=True)
+
+    amount = models.FloatField(default=0, blank=True)
 
 
 class Resources(BaseModel):
@@ -214,9 +252,29 @@ def update_cost_project(sender, instance, **kwargs):
             instance.status = status
             instance.signoff_date = None
 
+    milestones_obj = Milestones.objects.filter(project=instance)
+    amount = 0
+    for each in milestones_obj:
+        if each.payment_received:
+           amount += each.amount_percentage / 100 * instance.final_quote
+    instance.amount_received = amount
+    instance.amount_due = instance.final_quote - amount
+
 
 def update_cost(id_temp):
     project_obj = Project.objects.get(pk=id_temp)
+    project_obj.save()
+
+
+@receiver(pre_save, sender=Milestones)
+def update_amount_received_milestones(sender, instance, **kwargs):
+    project_obj = Project.objects.get(pk=instance.project.id)
+    project_obj.save()
+
+
+@receiver(post_save, sender=Milestones)
+def update_amount_received_milestones(sender, instance, **kwargs):
+    project_obj = Project.objects.get(pk=instance.project.id)
     project_obj.save()
 
 
@@ -257,4 +315,9 @@ def update_cost_resources_delete(sender, instance, **kwargs):
     # # project_obj.save()
     # instance.project.cost -= cost
     # instance.project.save()
+    update_cost(instance.project.id)
+
+
+@receiver(post_delete, sender=Milestones)
+def update_cost_milestones_delete(sender, instance, **kwargs):
     update_cost(instance.project.id)
